@@ -1,8 +1,18 @@
-import requests
-import asyncio
-from lxml import html
+import streamlit as st
 from telegram import Bot
 from telegram.constants import ParseMode
+import requests
+from lxml import html
+import asyncio
+
+# Definir valores fijos (token y chat_id)
+url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
+chat_id = '1560847300'
+
+alerta_enviada = False
+
+st.title("Alerta de Telegram")
 
 async def scrape_valor(url):
     # Realizar la solicitud HTTP, simula un navegador....
@@ -11,45 +21,48 @@ async def scrape_valor(url):
     }
     response = requests.get(url, headers=headers)
 
-    # Verificar si la solicitud fue exitosa (código de estado 200)
-    if response.status_code == 200:
-        # Parsear el contenido HTML de la página utilizando lxml
-        tree = html.fromstring(response.content)
+    tree = html.fromstring(response.content)
 
-        # Utilizar XPath para encontrar el elemento span específico
-        xpath_expression = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
-        valor_element = tree.xpath(xpath_expression)
+    # Utilizar XPath para encontrar el elemento span específico
+    xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
+    valor_element = tree.xpath(xpath)
 
-        # Extraer el contenido del elemento (sin verificar si se encontró o no)
-        valor = valor_element[0].text_content().strip()
-        return valor
-    else:
-        print(f"Error al obtener la página. Código de estado: {response.status_code}")
-        return None
+    # Extraer el contenido del elemento 
+    valor = valor_element[0].text_content().strip()
+    return float(valor.replace('$', '').replace(',', '.'))
 
 async def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
     await bot.send_message(chat_id=chat_id, text=mensaje, parse_mode=ParseMode.MARKDOWN)
 
 async def main():
-    # URL de la página web que deseas scrapear
-    url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+    global valor_objetivo, alerta_enviada
+    
+    # Obtener el valor inicial para el campo objetivo
+    valor_inicial = await scrape_valor(url)
+    valor_objetivo = st.number_input("Ingrese valor de alerta", value=round(1.01 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
+    
+    # Actualizar la variable global al ingresar un nuevo valor objetivo
+    if valor_objetivo != float(valor_inicial):
+        alerta_enviada = False
 
-    # Token y Chat ID de tu bot de Telegram
-    telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
-    chat_id = '1560847300'  # Reemplaza con el valor correcto
+    #st.success("Valor objetivo ingresado. La aplicación está esperando para lanzar la alerta.")
+    # Agregar el enlace al bot de Telegram
+    st.markdown("[Accede al bot de Telegram](https://t.me/fer_alert_bot)")
 
-    # Llamar a la función de scrape con la URL proporcionada
-    resultado = await scrape_valor(url)
+    while True:
+        # Llamar a la función de scrape con la URL proporcionada
+        valor_actual = await scrape_valor(url)
+        
+        mensaje = f"Nuevo valor U$D: {valor_actual}"
 
-    # Imprimir el resultado
-    if resultado:
-        mensaje = f"El valor extraído es: ${resultado}"
-
-        # Enviar alerta a Telegram
-        await enviar_alerta_telegram(telegram_token, chat_id, mensaje)
+        
+        if valor_actual > valor_objetivo and not alerta_enviada:
+            # Enviar alerta a Telegram
+            await enviar_alerta_telegram(telegram_token, chat_id, mensaje)
+            alerta_enviada = True
+        
+        await asyncio.sleep(30)
 
 if __name__ == "__main__":
-    # Ejecutar el bucle de eventos de asyncio
     asyncio.run(main())
-
