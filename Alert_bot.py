@@ -27,7 +27,7 @@ async def scrape_valor(url):
     xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
     valor_element = tree.xpath(xpath)
 
-    # Extraer el contenido del elemento 
+    # Extraer el contenido del elemento en formato adecuado
     valor = valor_element[0].text_content().strip()
     return float(valor.replace('$', '').replace(',', '.'))
 
@@ -40,13 +40,12 @@ async def main():
     
     # Obtener el valor inicial para el campo objetivo
     valor_inicial = await scrape_valor(url)
-    valor_objetivo = st.number_input("Ingrese valor de alerta", value=round(1.01 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
+    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.01 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
     
     # Actualizar la variable global al ingresar un nuevo valor objetivo
     if valor_objetivo != float(valor_inicial):
         alerta_enviada = False
 
-    #st.success("Valor objetivo ingresado. La aplicación está esperando para lanzar la alerta.")
     # Agregar el enlace al bot de Telegram
     st.markdown("[Accede al bot de Telegram](https://t.me/fer_alert_bot)")
 
@@ -56,7 +55,6 @@ async def main():
         
         mensaje = f"Nuevo valor U$D: {valor_actual}"
 
-        
         if valor_actual > valor_objetivo and not alerta_enviada:
             # Enviar alerta a Telegram
             await enviar_alerta_telegram(telegram_token, chat_id, mensaje)
