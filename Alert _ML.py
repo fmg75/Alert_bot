@@ -16,7 +16,7 @@ def scrape_valor(url):
     return valor_element[0].text_content().strip()
   
 # URL de la página web que deseas scrapear
-url = 'https://articulo.mercadolibre.com.ar/MLA-909556758-chomba-de-hombre-montagne-dry-pro-_JM#reco_item_pos=1&reco_backend=item_decorator&reco_backend_type=function&reco_client=home_items-decorator-legacy&reco_id=98dac2db-e255-4257-b647-cffadc875911&c_id=/home/bookmarks-recommendations-seed/element&c_uid=231f971d-d8b4-425b-aaf3-3eb69654ef0c&da_id=bookmark&da_position=1&id_origin=/home/dynamic_access&da_sort_algorithm=ranker'
+url = 'https://articulo.mercadolibre.com.ar/MLA-881360235-chomba-secado-rapido-dry-pro-hombre-montagne-verano-fresca-_JM#polycard_client=recommendations_home_navigation-recommendations&reco_backend=machinalis-homes-univb&reco_client=home_navigation-recommendations&reco_item_pos=2&reco_backend_type=function&reco_id=138c9af5-4a3c-41bb-9807-8057588f2f43&c_id=/home/navigation-recommendations/element&c_uid=e3501d1d-b391-4290-8100-82976d216b1a'
 
 # Llamar a la función de scrape con la URL proporcionada
 resultado = scrape_valor(url)
