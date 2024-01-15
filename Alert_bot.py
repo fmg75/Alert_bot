@@ -12,7 +12,7 @@ chat_id = '1560847300'
 
 alerta_enviada = False
 
-st.title("Alerta de Telegram")
+st.title("Alerta UBI")
 
 async def scrape_valor(url):
     # Realizar la solicitud HTTP, simula un navegador....
