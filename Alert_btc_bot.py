@@ -6,7 +6,7 @@ from lxml import html
 import asyncio
 
 # Definir valores fijos (token y chat_id)
-url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+url = 'https://www.coingecko.com/es/monedas/bitcoin'
 telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
 chat_id = '1560847300'
 
@@ -25,12 +25,13 @@ async def scrape_valor(url):
 
     # Utilizar XPath para encontrar el elemento span específico 
     #
-    xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
+    xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[3]/div/div[1]/span[1]/span'
     valor_element = tree.xpath(xpath)
 
     # Extraer el contenido del elemento en formato adecuado
-    valor = valor_element[0].text_content().strip()
-    return float(valor.replace('$', '').replace(',', '.'))
+  
+    return float(valor_element[0].text_content().split(',')[0].replace('$', '').replace('.', '').replace(',', '.'))
+
 
 async def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
@@ -39,9 +40,9 @@ async def enviar_alerta_telegram(token, chat_id, mensaje):
 async def main():
     global valor_objetivo, alerta_enviada
     
-    # Obtener el valor inicial para el campo objetivo + 0.1%
+    # Obtener el valor inicial para el campo objetivo + 1%
     valor_inicial = await scrape_valor(url)
-    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.001 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
+    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.001 * float(valor_inicial), 2), format="%.2f",step = 0.01 * float(valor_inicial))
     
     # Actualizar la variable global al ingresar un nuevo valor objetivo
     if valor_objetivo != float(valor_inicial):
@@ -61,7 +62,7 @@ async def main():
             await enviar_alerta_telegram(telegram_token, chat_id, mensaje)
             alerta_enviada = True
         
-        await asyncio.sleep(300)
+        await asyncio.sleep(30)
 
 if __name__ == "__main__":
     asyncio.run(main())
