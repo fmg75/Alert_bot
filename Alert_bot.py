@@ -39,9 +39,9 @@ async def enviar_alerta_telegram(token, chat_id, mensaje):
 async def main():
     global valor_objetivo, alerta_enviada
     
-    # Obtener el valor inicial para el campo objetivo + 0.1%
+    # Obtener el valor inicial para el campo objetivo + 10%
     valor_inicial = await scrape_valor(url)
-    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.001 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
+    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.1 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
     
     # Actualizar la variable global al ingresar un nuevo valor objetivo
     if valor_objetivo != float(valor_inicial):
