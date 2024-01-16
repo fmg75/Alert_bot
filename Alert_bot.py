@@ -61,7 +61,7 @@ async def main():
             await enviar_alerta_telegram(telegram_token, chat_id, mensaje)
             alerta_enviada = True
         
-        await asyncio.sleep(300)
+        await asyncio.sleep(60)
 
 if __name__ == "__main__":
     asyncio.run(main())
