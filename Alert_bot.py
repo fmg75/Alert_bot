@@ -54,7 +54,7 @@ async def main():
         # Llamar a la función de scrape con la URL proporcionada
         valor_actual = await scrape_valor(url)
         
-        mensaje = f"Nuevo valor U$D: {valor_actual}"
+        mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
 
         if valor_actual > valor_objetivo and not alerta_enviada:
             # Enviar alerta a Telegram
