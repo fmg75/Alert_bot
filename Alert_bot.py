@@ -6,7 +6,7 @@ from lxml import html
 import asyncio
 
 # Definir valores fijos (token y chat_id)
-url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+url = 'https://etherscan.io/dex/uniswapv2/0xe632ded5195e945a31f56d674aab0c0c9e7e812c'
 telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
 chat_id = '1560847300'
 
@@ -24,13 +24,13 @@ async def scrape_valor(url):
     tree = html.fromstring(response.content)
 
     # Utilizar XPath para encontrar el elemento span específico 
-    #
-    xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
+    
+    xpath = '/html/body/main/section[2]/div[2]/div[1]/div/div[1]/div/div[1]/span'
     valor_element = tree.xpath(xpath)
 
     # Extraer el contenido del elemento en formato adecuado
     valor = valor_element[0].text_content().strip()
-    return float(valor.replace('$', '').replace(',', '.'))
+    return float(valor.replace('$', ''))
 
 async def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
@@ -41,7 +41,7 @@ async def main():
     
     # Obtener el valor inicial para el campo objetivo + 10%
     valor_inicial = await scrape_valor(url)
-    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.1 * float(valor_inicial), 8), format="%.8f",step = 0.05 * float(valor_inicial))
+    valor_objetivo = st.number_input("Alerta cuando supere :", value=round(1.001 * float(valor_inicial), 8), format="%.8f",step = 0.1 * float(valor_inicial))
     
     # Actualizar la variable global al ingresar un nuevo valor objetivo
     if valor_objetivo != float(valor_inicial):
