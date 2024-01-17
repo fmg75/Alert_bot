@@ -49,18 +49,23 @@ def start(update: Updater, context: CallbackContext) -> None:
     context.user_data['chat_id'] = chat_id
     update.message.reply_text(f"Tu chat_id es : {chat_id}")
 
+def restart(update: Updater, context: CallbackContext) -> None:
+    # Realizar acciones necesarias para reiniciar
+    update.message.reply_text("El bot se reiniciará ahora.")
+    # Agrega aquí cualquier lógica necesaria para reiniciar
+    # Por ejemplo, limpiar variables de estado, cerrar conexiones, etc.
+
 def main():
     global alerta_enviada  # Declarar como global
     st.title("Alerta UBI")
 
-# Mostrar un mensaje de instrucciones
-#st.write("Haz clic en el siguiente enlace para iniciar una conversación con el bot de Telegram:")
+    # Mostrar un mensaje de instrucciones
     st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/fer_alert_bot)")
 
     # Campo para ingresar el chat_id
     chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
 
-# Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
+    # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
     if chat_id:
         valor_inicial = scrape_valor(url)
 
@@ -68,7 +73,7 @@ def main():
         valor_objetivo = st.number_input("Alerta cuando supere: ", value=round(1.001 * float(valor_inicial), 8), format="%.8f", step=0.1 * float(valor_inicial))
 
         while True:
-        # Llamar a la función de scrape con la URL proporcionada
+            # Llamar a la función de scrape con la URL proporcionada
             valor_actual = scrape_valor(url)
         
             if valor_actual > valor_objetivo and not alerta_enviada:
@@ -77,9 +82,14 @@ def main():
                 enviar_alerta_telegram(telegram_token, chat_id, mensaje)
                 alerta_enviada = True
 
+                # Pausa para evitar alertas múltiples en ráfaga
+                time.sleep(60)  # ajusta según sea necesario
+
             # Restablecer la alerta_enviada a False antes de volver a dormir
             alerta_enviada = False
-    time.sleep(30)
+
+            # Pausa antes de la siguiente iteración
+            time.sleep(30)
         
            
 
@@ -103,7 +113,7 @@ def configurar_telegram():
 
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    
+    dp.add_handler(CommandHandler("restart", restart))
 if __name__ == "__main__":
     configurar_telegram()
     main()
