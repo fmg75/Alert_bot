@@ -6,7 +6,7 @@ from lxml import html
 import time
 import config
 
-url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+url = config.URL
 telegram_token = config.TOKEN
 
 def scrape_valor(url):
