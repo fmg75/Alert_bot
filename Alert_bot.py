@@ -4,9 +4,10 @@ from telegram.ext import Updater, CommandHandler
 import requests
 from lxml import html
 import time
+import config
 
 url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
-telegram_token = '6663952815:AAEp7_5jgsE_AReFvrdE34NGwzjj6E1vLqs'
+telegram_token = config.TOKEN
 
 def scrape_valor(url):
     while True:
@@ -107,11 +108,10 @@ def interface():
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
 
         # Pausa antes de la siguiente iteración
-        time.sleep(60)
+        time.sleep(30)
 
         # Actualizar la interfaz
-        st.rerun()           
-
+        #st.experimental_rerun()     
 
 if __name__ == "__main__":
     telegram_bot()
