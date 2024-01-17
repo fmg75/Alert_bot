@@ -1,6 +1,7 @@
 import streamlit as st
 from telegram import Bot
 from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.utils.request import Request
 import requests
 from lxml import html
 import time
@@ -79,7 +80,8 @@ def main():
             time.sleep(30)
 
 def configurar_telegram():
-    bot = Bot(token=telegram_token)
+    request = Request(con_pool_size=8)
+    bot = Bot(token=telegram_token, request=request)
     updater = Updater(bot=bot, use_context=True)
     
     try:
