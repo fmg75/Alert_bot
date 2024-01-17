@@ -79,7 +79,7 @@ def main():
 
             # Restablecer la alerta_enviada a False antes de volver a dormir
             alerta_enviada = False
-            time.sleep(30)
+    time.sleep(30)
         
            
 
