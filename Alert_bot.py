@@ -36,7 +36,7 @@ def start(update: Updater, context: CallbackContext) -> None:
     global chat_id
     chat_id = update.message.chat_id
     context.user_data['chat_id'] = chat_id
-    update.message.reply_text(f"¡Hola! Tu chat_id es:  {chat_id}")
+    update.message.reply_text(f"Tu chat_id es : {chat_id}")
 
 def main():
     global alerta_enviada  # Declarar como global
