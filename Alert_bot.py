@@ -86,8 +86,8 @@ def main():
 def configurar_telegram():
     request = Request(con_pool_size=8)
     bot = Bot(token=telegram_token, request=request)
-    updater = Updater(bot=bot, use_context=True)
-    
+    #updater = Updater(bot=bot, use_context=True)
+    updater = Updater(bot=bot)
     try:
         updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
     except Exception as e:
