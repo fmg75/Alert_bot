@@ -72,12 +72,16 @@ def main():
             valor_actual = scrape_valor(url)
         
             if valor_actual > valor_objetivo and not alerta_enviada:
-            # Enviar alerta a Telegram
+                # Enviar alerta a Telegram
                 mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
                 enviar_alerta_telegram(telegram_token, chat_id, mensaje)
-                alerta_enviada = False
-        
+                alerta_enviada = True
+
+            # Restablecer la alerta_enviada a False antes de volver a dormir
+            alerta_enviada = False
             time.sleep(30)
+        
+           
 
 def configurar_telegram():
     request = Request(con_pool_size=8)
