@@ -38,7 +38,6 @@ def scrape_valor(url):
             print(f"Error al obtener el valor: {e}")
             time.sleep(5)  # Esperar 5 segundos antes de intentar nuevamente
 
-
 def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
     bot.send_message(chat_id=chat_id, text=mensaje)
@@ -49,11 +48,6 @@ def start(update: Updater, context: CallbackContext) -> None:
     context.user_data['chat_id'] = chat_id
     update.message.reply_text(f"Tu chat_id es : {chat_id}")
 
-def restart(update: Updater, context: CallbackContext) -> None:
-    # Realizar acciones necesarias para reiniciar
-    update.message.reply_text("El bot se reiniciará ahora.")
-    # Agrega aquí cualquier lógica necesaria para reiniciar
-    # Por ejemplo, limpiar variables de estado, cerrar conexiones, etc.
 
 def main():
     global alerta_enviada  # Declarar como global
@@ -92,28 +86,18 @@ def main():
             time.sleep(30)
         
            
-
 def configurar_telegram():
-    request = Request(con_pool_size=8)
-    bot = Bot(token=telegram_token, request=request)
+    #request = Request(con_pool_size=8)
+    #bot = Bot(token=telegram_token, request=request)
+    bot = Bot(token=telegram_token)
     #updater = Updater(bot=bot, use_context=True)
     updater = Updater(bot=bot)
-    try:
-        updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
-    except Exception as e:
-        error_message = str(e)
-        if 'RetryAfter' in error_message:
-            retry_after_index = error_message.find('RetryAfter')
-            retry_after_value = float(error_message[retry_after_index:].split()[1])
-            print(f"Se excedió el límite de envío. Esperando {retry_after_value} segundos antes de intentar nuevamente.")
-            time.sleep(retry_after_value)
-            updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
-        else:
-            print(f"Error al establecer el webhook: {e}")
-
+    updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
+    
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("restart", restart))
+  
+
 if __name__ == "__main__":
     configurar_telegram()
     main()
