@@ -47,14 +47,14 @@ def main():
     st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/fer_alert_bot)")
 
     # Campo para ingresar el chat_id
-    chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start ")
+    chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
 
 # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
     if chat_id:
         valor_inicial = scrape_valor(url)
 
         # Campo para ingresar el valor objetivo
-        valor_objetivo = st.number_input("Alerta cuando supere:", value=round(1.001 * float(valor_inicial), 8), format="%.8f", step=0.1 * float(valor_inicial))
+        valor_objetivo = st.number_input("Alerta cuando supere: ", value=round(1.001 * float(valor_inicial), 8), format="%.8f", step=0.1 * float(valor_inicial))
 
         while True:
         # Llamar a la función de scrape con la URL proporcionada
