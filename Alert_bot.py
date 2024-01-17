@@ -36,7 +36,7 @@ def start(update: Updater, context: CallbackContext) -> None:
     global chat_id
     chat_id = update.message.chat_id
     context.user_data['chat_id'] = chat_id
-    update.message.reply_text(f"¡Hola! Tu chat_id es {chat_id}")
+    update.message.reply_text(f"¡Hola! Tu chat_id es:  {chat_id}")
 
 def main():
     global alerta_enviada  # Declarar como global
@@ -47,7 +47,7 @@ def main():
     st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/fer_alert_bot)")
 
     # Campo para ingresar el chat_id
-    chat_id = st.text_input("Ingresa tu chat_id (obtenido al iniciar la conversación con el bot de Telegram):")
+    chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start ")
 
 # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
     if chat_id:
