@@ -1,16 +1,13 @@
 import streamlit as st
 from telegram import Bot
 from telegram.ext import Updater, CommandHandler, CallbackContext
-from telegram.utils.request import Request
 import requests
 from lxml import html
 import time
 
-# Definir valores fijos (token y chat_id)
+# Definir valores fijos 
 url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
-telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
-
-alerta_enviada = False
+telegram_token = '6893975880:AAFbOxnGVJT8DSYwvnPFfO3Ccub3wnLXXjM'
 
 def scrape_valor(url):
     while True:
@@ -22,7 +19,6 @@ def scrape_valor(url):
             response = requests.get(url, headers=headers)
 
             tree = html.fromstring(response.content)
-
             # Utilizar XPath para encontrar el elemento span específico
             xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
             valor_element = tree.xpath(xpath)
@@ -43,24 +39,35 @@ def enviar_alerta_telegram(token, chat_id, mensaje):
     bot.send_message(chat_id=chat_id, text=mensaje)
 
 def start(update: Updater, context: CallbackContext) -> None:
-    global chat_id
-    chat_id = update.message.chat_id
+    chat_id = update.effective_chat.id
     context.user_data['chat_id'] = chat_id
-    update.message.reply_text(f"Tu chat_id es : {chat_id}")
+    update.message.reply_text(f"Tu chat_id es: {chat_id}")
+    
+           
+def configurar_telegram():
+    bot = Bot(token=telegram_token)
+    updater = Updater(bot=bot, use_context=True)
+    updater.bot.setWebhook()
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    updater.start_polling()
 
+if __name__ == "__main__":
+    configurar_telegram()
+    
 
-def main():
-    global alerta_enviada  # Declarar como global
-    st.title("Alerta UBI")
+# interface streamlit
+    
+st.title("Alerta UBI")
 
-    # Mostrar un mensaje de instrucciones
-    st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/fer_alert_bot)")
+# Mostrar un mensaje de instrucciones
+st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/alert_ubi_bot)")
 
-    # Campo para ingresar el chat_id
-    chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
+# Campo para ingresar el chat_id
+chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
 
-    # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
-    if chat_id:
+# Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
+if chat_id:
         valor_inicial = scrape_valor(url)
 
         # Campo para ingresar el valor objetivo
@@ -70,34 +77,10 @@ def main():
             # Llamar a la función de scrape con la URL proporcionada
             valor_actual = scrape_valor(url)
         
-            if valor_actual > valor_objetivo and not alerta_enviada:
+            if valor_actual > valor_objetivo:
                 # Enviar alerta a Telegram
                 mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
                 enviar_alerta_telegram(telegram_token, chat_id, mensaje)
-                alerta_enviada = True
-
-                # Pausa para evitar alertas múltiples en ráfaga
-                time.sleep(60)  # ajusta según sea necesario
-
-            # Restablecer la alerta_enviada a False antes de volver a dormir
-            alerta_enviada = False
-
+               
             # Pausa antes de la siguiente iteración
-            time.sleep(30)
-        
-           
-def configurar_telegram():
-    #request = Request(con_pool_size=8)
-    #bot = Bot(token=telegram_token, request=request)
-    bot = Bot(token=telegram_token)
-    #updater = Updater(bot=bot, use_context=True)
-    updater = Updater(bot=bot)
-    updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
-    
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-  
-
-if __name__ == "__main__":
-    configurar_telegram()
-    main()
+            time.sleep(60)           
