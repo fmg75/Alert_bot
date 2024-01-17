@@ -39,9 +39,10 @@ def enviar_alerta_telegram(token, chat_id, mensaje):
     bot.send_message(chat_id=chat_id, text=mensaje)
 
 def start(update: Updater, context: CallbackContext) -> None:
-    chat_id = update.effective_chat.id
+    global chat_id
+    chat_id = update.message.chat_id
     context.user_data['chat_id'] = chat_id
-    update.message.reply_text(f"Tu chat_id es: {chat_id}")
+    update.message.reply_text(f"Tu chat_id es : {chat_id}")
     
            
 def configurar_telegram():
