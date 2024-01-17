@@ -75,7 +75,7 @@ def main():
             # Enviar alerta a Telegram
                 mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
                 enviar_alerta_telegram(telegram_token, chat_id, mensaje)
-                alerta_enviada = True
+                alerta_enviada = False
         
             time.sleep(30)
 
