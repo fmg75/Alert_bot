@@ -12,21 +12,31 @@ telegram_token = '6529284879:AAGnwzxSS2DauwYdsEEyMvI__ZelSbfchTg'
 alerta_enviada = False
 
 def scrape_valor(url):
-    # Realizar la solicitud HTTP, simula un navegador....
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-    }
-    response = requests.get(url, headers=headers)
+    while True:
+        try:
+            # Realizar la solicitud HTTP, simula un navegador....
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+            }
+            response = requests.get(url, headers=headers)
 
-    tree = html.fromstring(response.content)
+            tree = html.fromstring(response.content)
 
-    # Utilizar XPath para encontrar el elemento span específico
-    xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
-    valor_element = tree.xpath(xpath)
+            # Utilizar XPath para encontrar el elemento span específico
+            xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
+            valor_element = tree.xpath(xpath)
 
-    # Extraer el contenido del elemento en formato adecuado
-    valor = valor_element[0].text_content().strip()
-    return float(valor.replace('$', '').replace(',', '.'))
+            # Verificar si valor_element está vacío
+            if not valor_element:
+                raise ValueError("No se pudo encontrar el elemento span específico")
+
+            # Extraer el contenido del elemento en formato adecuado
+            valor = valor_element[0].text_content().strip()
+            return float(valor.replace('$', '').replace(',', '.'))
+        except Exception as e:
+            print(f"Error al obtener el valor: {e}")
+            time.sleep(5)  # Esperar 5 segundos antes de intentar nuevamente
+
 
 def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
@@ -60,24 +70,34 @@ def main():
         # Llamar a la función de scrape con la URL proporcionada
             valor_actual = scrape_valor(url)
         
-            mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
-
             if valor_actual > valor_objetivo and not alerta_enviada:
             # Enviar alerta a Telegram
+                mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
                 enviar_alerta_telegram(telegram_token, chat_id, mensaje)
                 alerta_enviada = True
         
             time.sleep(30)
 
-
 def configurar_telegram():
     bot = Bot(token=telegram_token)
     updater = Updater(bot=bot, use_context=True)
-    updater.bot.setWebhook()
+    
+    try:
+        updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
+    except Exception as e:
+        error_message = str(e)
+        if 'RetryAfter' in error_message:
+            retry_after_index = error_message.find('RetryAfter')
+            retry_after_value = float(error_message[retry_after_index:].split()[1])
+            print(f"Se excedió el límite de envío. Esperando {retry_after_value} segundos antes de intentar nuevamente.")
+            time.sleep(retry_after_value)
+            updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
+        else:
+            print(f"Error al establecer el webhook: {e}")
+
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    updater.start_polling()
-
+    
 if __name__ == "__main__":
     configurar_telegram()
     main()
