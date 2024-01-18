@@ -18,7 +18,7 @@ url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
 telegram_token = st.secrets["TOKEN"]
 
 # Función para realizar el scraping de valor
-@st.cache(ttl=90)
+@st.cache_data(ttl=90)
 def scrape_valor(url):
     while True:
         try:
