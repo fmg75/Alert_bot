@@ -41,7 +41,7 @@ def scrape_valor(url):
             return float(valor.replace('$', '').replace(',', '.'))
         except Exception as e:
             print(f"Error al obtener el valor: {e}")
-            time.sleep(5)
+            time.sleep(1)
 
 # Función para enviar alerta a Telegram
 def enviar_alerta_telegram(token, chat_id, mensaje):
