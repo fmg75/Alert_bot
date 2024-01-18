@@ -111,7 +111,7 @@ def interface():
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
 
         # Pausa antes de la siguiente iteración
-        time.sleep(30)
+        time.sleep(5)
 
         # Actualizar la interfaz
         st.experimental_rerun()     
