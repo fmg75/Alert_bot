@@ -21,7 +21,7 @@ telegram_token = st.secrets["TOKEN"]
 @st.cache(ttl=15)
 def scrape_valor(url):
     while True:
-#        try:
+        try:
             # Realizar la solicitud HTTP, simula un navegador....
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
@@ -34,15 +34,15 @@ def scrape_valor(url):
             valor_element = tree.xpath(xpath)
 
             # Verificar si valor_element está vacío
-#            if not valor_element:
-#                raise ValueError("No se pudo encontrar el elemento span específico")
+            if not valor_element:
+                raise ValueError("No se pudo encontrar el elemento span específico")
 
             # Extraer el contenido del elemento en formato adecuado
             valor = valor_element[0].text_content().strip()
             return float(valor.replace('$', '').replace(',', '.'))
-#        except Exception as e:
-#            print(f"Error al obtener el valor: {e}")
-#            time.sleep(1)
+        except Exception as e:
+            print(f"Error al obtener el valor: {e}")
+            time.sleep(1)
 
 # Función para enviar alerta a Telegram
 def enviar_alerta_telegram(token, chat_id, mensaje):
