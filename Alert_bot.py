@@ -114,7 +114,7 @@ def interface():
         time.sleep(30)
 
         # Actualizar la interfaz
-        #st.experimental_rerun()     
+        st.experimental_rerun()     
 
 if __name__ == "__main__":
     telegram_bot()
