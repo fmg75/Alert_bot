@@ -1,17 +1,23 @@
 import streamlit as st
+import requests
+import time
 from telegram import Bot
 from telegram.ext import Updater, CommandHandler
-import requests
 from lxml import html
-import time
-#import config
+import config
+import os
+import sys
 
-#url = config.URL
+# Redirigir la salida estándar y de error a os.devnull 
+sys.stdout = open(os.devnull, 'w')
+sys.stderr = open(os.devnull, 'w')
+
+# URL de scraping
 url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
 #telegram_token = config.TOKEN
 telegram_token = st.secrets["TOKEN"]
 
-
+# Función para realizar el scraping de valor
 def scrape_valor(url):
     while True:
         try:
@@ -35,87 +41,66 @@ def scrape_valor(url):
             return float(valor.replace('$', '').replace(',', '.'))
         except Exception as e:
             print(f"Error al obtener el valor: {e}")
-            time.sleep(5)  # Esperar 5 segundos antes de intentar nuevamente
+            time.sleep(5)
 
+# Función para enviar alerta a Telegram
 def enviar_alerta_telegram(token, chat_id, mensaje):
     bot = Bot(token)
     bot.send_message(chat_id=chat_id, text=mensaje)
 
-# Inicializar el chat_id como None
-chat_id = None
-
 # Función para manejar el comando /start
 def start(update, context):
-    global chat_id
     chat_id = update.message.chat_id
     context.user_data['chat_id'] = chat_id
     update.message.reply_text(f"Tu chat_id es: {chat_id}")
-     
+
+# Función principal para configurar el bot de Telegram
 def telegram_bot():
     bot = Bot(token=telegram_token)
     updater = Updater(bot=bot, use_context=True)
-    try:
-        updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
-    except Exception as e:
-        error_message = str(e)
-        if 'RetryAfter' in error_message:
-            retry_after_index = error_message.find('RetryAfter')
-            retry_after_value = float(error_message[retry_after_index:].split()[1])
-            print(f"Se excedió el límite de envío. Esperando {retry_after_value} segundos antes de intentar nuevamente.")
-            time.sleep(retry_after_value)
-            updater.bot.setWebhook(url='https://alertubi.streamlit.app/')
-        else:
-            print(f"Error al establecer el webhook: {e}")
-
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     updater.start_polling()
 
+# Función principal para la interfaz de Streamlit
 def interface():
-    # interface streamlit
     st.title("Alerta UBI")
-    # Mostrar un mensaje de instrucciones
-    st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/Alert_Ubi_bot)")
+    st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/Alert_7011371_bot)")
+    
     # Campo para ingresar el chat_id
     chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
-    
+
     # Inicializar valor_objetivo fuera de la condición
     valor_objetivo = st.session_state.get('valor_objetivo', 0.00100000)
-    
-    # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere:
+
+    # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere
     if chat_id:
         input_key = "valor_objetivo_input"
-
-        # Campo para ingresar o actualizar el valor objetivo
         valor_objetivo = st.number_input(
             "Alerta cuando supere: ",
             value=valor_objetivo,
             format="%.8f",
             step=0.1 * float(valor_objetivo),
-            key=input_key  # Proporcionar una clave única
+            key=input_key
         )
 
-        # Guardar el valor_objetivo en la sesión
-        st.session_state.valor_objetivo = valor_objetivo
-        # Llamar a la función de scrape con la URL proporcionada una vez
         valor_actual = scrape_valor(url)
         st.write('Valor actual ', valor_actual)
 
     while True:
-        # Llamar a la función de scrape con la URL proporcionada
+        st.session_state.valor_objetivo = valor_objetivo
         valor_actual = scrape_valor(url)
 
         if valor_actual > valor_objetivo:
-            # Enviar alerta a Telegram
             mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
-
-        # Pausa antes de la siguiente iteración
-        time.sleep(5)
-
-        # Actualizar la interfaz
-        st.experimental_rerun()     
+            break
+        
 
 if __name__ == "__main__":
+
     telegram_bot()
     interface()
+    
+
+    
