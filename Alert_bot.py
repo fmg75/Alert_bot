@@ -72,7 +72,8 @@ def interface():
 
     # Inicializar valor_objetivo fuera de la condición
     valor_objetivo = st.session_state.get('valor_objetivo', 0.00100000)
-
+    valor_actual = scrape_valor(url)
+    st.write('Valor actual UBI', valor_actual)
     # Verificar si se ingresó un chat_id y mostrar el campo Alerta cuando supere
     if chat_id:
         input_key = "valor_objetivo_input"
@@ -84,8 +85,8 @@ def interface():
             key=input_key
         )
 
-        valor_actual = scrape_valor(url)
-        st.write('Valor actual ', valor_actual)
+        #valor_actual = scrape_valor(url)
+        #st.write('Valor actual ', valor_actual)
 
     while True:
         st.session_state.valor_objetivo = valor_objetivo
