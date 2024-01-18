@@ -69,7 +69,7 @@ def telegram_bot():
 
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    #updater.start_polling()
+    updater.start_polling()
 
 def interface():
     # interface streamlit
