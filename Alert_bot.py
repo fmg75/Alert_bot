@@ -89,6 +89,7 @@ def interface():
         #st.write('Valor actual ', valor_actual)
 
     while True:
+        time.sleep(30)
         st.session_state.valor_objetivo = valor_objetivo
         valor_actual = scrape_valor(url)
 
