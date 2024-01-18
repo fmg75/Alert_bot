@@ -80,7 +80,7 @@ def interface():
             "Alerta cuando supere: ",
             value=valor_objetivo,
             format="%.8f",
-            step=0.1 * float(valor_objetivo),
+            step=0.00005,
             key=input_key
         )
 
