@@ -4,10 +4,13 @@ from telegram.ext import Updater, CommandHandler
 import requests
 from lxml import html
 import time
-import config
+#import config
 
-url = config.URL
-telegram_token = config.TOKEN
+#url = config.URL
+url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+#telegram_token = config.TOKEN
+telegram_token = st.secrets["TOKEN"]
+
 
 def scrape_valor(url):
     while True:
