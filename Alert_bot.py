@@ -75,7 +75,7 @@ def interface():
     # interface streamlit
     st.title("Alerta UBI")
     # Mostrar un mensaje de instrucciones
-    st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/price_ubi_bot)")
+    st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/Alert_Ubi_bot)")
     # Campo para ingresar el chat_id
     chat_id = st.text_input("Ingresa tu chat_id (iniciar en chatbot con /start) ")
     
