@@ -4,7 +4,7 @@ import time
 from telegram import Bot
 from telegram.ext import Updater, CommandHandler
 from lxml import html
-import config
+#import config
 import os
 import sys
 
