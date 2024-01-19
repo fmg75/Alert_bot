@@ -42,18 +42,22 @@ def enviar_alerta_telegram(token, chat_id, mensaje):
 st.title("Alerta UBI")
 st.markdown("[Envia 'Hola' al bot de Telegram](https://t.me/Alert_7011371_bot)")
 
-response = requests.get(f'https://api.telegram.org/bot{telegram_token}/getUpdates')
+def chat():
 
-updates = response.json().get('result', [])
+    response = requests.get(f'https://api.telegram.org/bot{telegram_token}/getUpdates')
 
-for update in updates:
-    message = update.get('message', {})
-    text = message.get('text', '')
+    updates = response.json().get('result', [])
 
-    # Verificar si el mensaje contiene 'hola'
-    if 'Hola' in text:
+    for update in updates:
+        message = update.get('message', {})
+        text = message.get('text', '')
+
+        # Verificar si el mensaje contiene 'hola'
+        if 'Hola' in text:
+
         # Obtener el chat_id del usuario que envió el mensaje
-        chat_id = message['chat']['id']
+            chat_id = message['chat']['id']
+            return chat_id
 
 
 valor_objetivo = st.number_input(
@@ -75,9 +79,11 @@ while True:
     
     if valor_actual > valor_objetivo:
         mensaje = f"Nuevo precio UBI U$D: {round(valor_actual,6)}"
+        chat_id = chat()
         if chat_id:
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
         else:
+            container.text('Saluda al bot para recibir notificaciones!')
             time.sleep(5)
         break
 
