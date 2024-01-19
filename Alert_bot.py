@@ -40,7 +40,7 @@ def enviar_alerta_telegram(token, chat_id, mensaje):
 
 #interfaz de Streamlit
 st.title("Alerta UBI")
-st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/Alert_7011371_bot)")
+st.markdown("[Envia 'Hola' al bot de Telegram](https://t.me/Alert_7011371_bot)")
 
 response = requests.get(f'https://api.telegram.org/bot{telegram_token}/getUpdates')
 
@@ -51,7 +51,7 @@ for update in updates:
     text = message.get('text', '')
 
     # Verificar si el mensaje contiene 'hola'
-    if 'hola' in text:
+    if 'Hola' in text:
         # Obtener el chat_id del usuario que envió el mensaje
         chat_id = message['chat']['id']
 
