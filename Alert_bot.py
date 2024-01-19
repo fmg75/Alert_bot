@@ -74,8 +74,11 @@ while True:
     container.text(texto_mostrado)
     
     if valor_actual > valor_objetivo:
-        mensaje = f"Nuevo precio UBI U$D: {valor_actual}"
-        enviar_alerta_telegram(telegram_token, chat_id, mensaje)
+        mensaje = f"Nuevo precio UBI U$D: {round(valor_actual,6)}"
+        if chat_id:
+            enviar_alerta_telegram(telegram_token, chat_id, mensaje)
+        else:
+            time.sleep(5)
         break
 
     time.sleep(30)
