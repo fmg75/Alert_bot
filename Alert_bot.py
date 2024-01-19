@@ -1,29 +1,36 @@
 import streamlit as st
 import requests
+from datetime import datetime, timedelta
 import time
 from telegram import Bot
-from lxml import html
 #import config
 
 # URL de scraping
-url = 'https://www.coingecko.com/es/monedas/universal-basic-income'
+url = "https://www.coingecko.com/price_charts/15269/usd/24_hours.json"
 #telegram_token = config.TOKEN
 telegram_token = st.secrets["TOKEN"]
 
 def scrape_valor(url):
-    while True:
-            # Realizar la solicitud HTTP, simula un navegador....
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-            }
-            response = requests.get(url, headers=headers)
+             # Realizar la solicitud HTTP, simula un navegador....
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    response = requests.get(url, headers=headers)
+    data = response.json()
 
-            tree = html.fromstring(response.content)
-            # Utilizar XPath para encontrar el elemento span específico
-            xpath = '/html/body/div[3]/main/div[1]/div[1]/div/div[1]/div[2]/div/div[1]/span[1]/span'
-            valor_element = tree.xpath(xpath)
-            valor = valor_element[0].text_content().strip()
-            return float(valor.replace('$', '').replace(',', '.'))
+            # Extrae hora
+    timestamp_milliseconds = data["stats"][-1][0]
+    timestamp_seconds = timestamp_milliseconds / 1000
+    datetime_object_utc = datetime.utcfromtimestamp(timestamp_seconds)
+    # Ajustar a la zona horaria restando 2 horas
+    datetime_object_local = datetime_object_utc - timedelta(hours=3)
+    
+    # Formatear la fecha y hora como hh:mm:ss
+    formatted_time = datetime_object_local.strftime("%H:%M:%S")
+    rounded_seconds = round(datetime_object_local.second)
+
+    last_element = data["stats"][-1][-1]
+    
+    return last_element,formatted_time,rounded_seconds
        
 # Función para enviar alerta a Telegram
 def enviar_alerta_telegram(token, chat_id, mensaje):
@@ -37,7 +44,18 @@ st.markdown("[Iniciar conversación con el bot de Telegram](https://t.me/Alert_7
 
 response = requests.get(f'https://api.telegram.org/bot{telegram_token}/getUpdates')
 
-chat_id = response.json()['result'][0]['message']['chat']['id']
+updates = response.json().get('result', [])
+
+for update in updates:
+    message = update.get('message', {})
+    text = message.get('text', '')
+
+    # Verificar si el mensaje contiene 'hola'
+    if 'hola' in text:
+        # Obtener el chat_id del usuario que envió el mensaje
+        chat_id = message['chat']['id']
+
+
 valor_objetivo = st.number_input(
             "Alerta cuando supere: ",
             value=0.001,
@@ -49,12 +67,15 @@ valor_objetivo = st.number_input(
 container = st.empty()
 
 while True:
-    valor_actual = scrape_valor(url)
-    container.text('Valor actual UBI: {:.8f}'.format(valor_actual))  # Muestra el valor en una sola línea
+    valor_actual, formatted_time, rounded_seconds = scrape_valor(url)
 
+    # Concatena el valor actual y la leyenda del dato del tiempo en el contenedor
+    texto_mostrado = 'Precio actual UBI: {:.6f}    Ultima actualizacion precio: {}'.format(valor_actual, formatted_time[:-2] + f"{rounded_seconds:02}")
+    container.text(texto_mostrado)
+    
     if valor_actual > valor_objetivo:
-        mensaje = f"Nuevo valor UBI U$D: {valor_actual}"
+        mensaje = f"Nuevo precio UBI U$D: {valor_actual}"
         enviar_alerta_telegram(telegram_token, chat_id, mensaje)
         break
 
-    time.sleep(3)
+    time.sleep(30)
