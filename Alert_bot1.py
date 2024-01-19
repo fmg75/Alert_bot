@@ -79,7 +79,7 @@ while True:
 
     if valor_actual > valor_objetivo:
         mensaje = f"Nuevo precio UBI U$D: {round(valor_actual, 6)}"
-        chat_id = start()
+        chat_id = start
         if chat_id:
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
         else:
