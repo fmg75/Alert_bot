@@ -83,6 +83,7 @@ while True:
         if chat_id:
             enviar_alerta_telegram(telegram_token, chat_id, mensaje)
         else:
+            print(chat_id)
             container.text('Saluda al bot para recibir notificaciones!')
             time.sleep(5)
         break
