@@ -57,9 +57,9 @@ for update in updates:
 
 
 valor_objetivo = st.number_input(
-            "Alerta cuando supere: ",
+            "Alerta cuando el precio supere: ",
             value=0.001,
-            format="%.8f",
+            format="%.6f",
             step=0.00005
         )
     
@@ -81,4 +81,4 @@ while True:
             time.sleep(5)
         break
 
-    time.sleep(30)
+    time.sleep(60)
