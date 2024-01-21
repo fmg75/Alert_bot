@@ -4,10 +4,9 @@ from telegram.ext import CommandHandler, CallbackContext, Updater
 import requests
 import threading
 import time
-#import config
+import config
 
-telegram_token = st.secrets('TOKEN')
-#telegram_token = config.TOKEN
+telegram_token = config.TOKEN
 url = "https://www.coingecko.com/price_charts/15269/usd/24_hours.json"
 
 
@@ -65,17 +64,7 @@ def send_alert(chat_id, valor_objetivo, valor_actual):
         if valor_objetivo is not None and valor_actual > valor_objetivo:
             mensaje = f"Nuevo precio UBI U$D: {round(valor_actual, 6)}"
             bot.send_message(chat_id=chat_id, text=mensaje)
-            # Solicitar al usuario que ingrese un nuevo valor objetivo
-            actualizar_valor_objetivo(chat_id, valor_objetivo)
                     
-# Función para actualizar el valor objetivo
-def actualizar_valor_objetivo(chat_id, valor_objetivo):
-    nuevo_valor_objetivo = round(valor_objetivo * 1.05, 6)  # Incrementar en un 5%
-    bot.send_message(chat_id=chat_id, text=f"Nuevo objetivo + 5%: {round(nuevo_valor_objetivo, 6)}")
-    # Actualizar el valor objetivo compartido
-    with lock:
-        global shared_valor_objetivo
-        shared_valor_objetivo = nuevo_valor_objetivo
 
 
 # Configurar el bot con el token proporcionado por BotFather
