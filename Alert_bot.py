@@ -6,7 +6,7 @@ import threading
 import time
 #import config
 
-telegram_token = st.secrets("TOKEN")
+telegram_token = st.secrets('TOKEN')
 #telegram_token = config.TOKEN
 url = "https://www.coingecko.com/price_charts/15269/usd/24_hours.json"
 
@@ -116,7 +116,7 @@ def update_interface():
 # Ejecutar la aplicación Streamlit
         
 if __name__ == "__main__":
-    telegram_token = st.secrets('TOKEN')
+  
     st.title("Alerta Precio UBI")
     st_container = st.empty()  
 
