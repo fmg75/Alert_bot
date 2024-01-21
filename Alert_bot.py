@@ -34,8 +34,7 @@ def scrape_and_update_valor(url):
         valor_actual = scrape_valor(url)
         with lock:
             shared_valor_actual = valor_actual
-        #time.sleep(60)  # Esperar 1 minuto antes de la próxima actualización
-
+        
 # Función para manejar el comando /start y obtener el chat_id y el valor objetivo
 def start(update: Update, context: CallbackContext):
     global shared_chat_id
@@ -65,7 +64,6 @@ def send_alert(chat_id, valor_objetivo, valor_actual):
         if valor_objetivo is not None and valor_actual > valor_objetivo:
             mensaje = f"Nuevo precio UBI U$D: {round(valor_actual, 6)}"
             bot.send_message(chat_id=chat_id, text=mensaje)
-            # Solicitar al usuario que ingrese un nuevo valor objetivo
             actualizar_valor_objetivo(chat_id, valor_objetivo)
                     
 # Función para actualizar el valor objetivo
@@ -111,14 +109,15 @@ def update_interface():
     if chat_id is not None:
         st_container.text(f'Precio actual UBI: {valor_actual:.6f}\n'
                           f'Valor objetivo recibido en la app: {valor_objetivo},\n')      
-        # Pasa chat_id, valor_objetivo y valor_actual como argumentos
+
         send_alert(chat_id, valor_objetivo, valor_actual)
+
 
 # Ejecutar la aplicación Streamlit
         
 if __name__ == "__main__":
     st.title("Alerta Precio UBI")
-    st_container = st.empty()  # Crea un contenedor vacío
+    st_container = st.empty()  
 
     while True:
         update_interface()
