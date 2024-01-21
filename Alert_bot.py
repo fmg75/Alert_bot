@@ -116,6 +116,7 @@ def update_interface():
 # Ejecutar la aplicación Streamlit
         
 if __name__ == "__main__":
+    telegram_token = st.secrets('TOKEN')
     st.title("Alerta Precio UBI")
     st_container = st.empty()  
 
