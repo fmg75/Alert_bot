@@ -6,9 +6,9 @@ import threading
 import time
 import config
 
+
 telegram_token = config.TOKEN
 url = "https://www.coingecko.com/price_charts/15269/usd/24_hours.json"
-
 
 def scrape_valor(url):
              # Realizar la solicitud HTTP, simula un navegador....
@@ -28,12 +28,11 @@ lock = threading.Lock()
 
 # Función para realizar scraping y actualizar la variable compartida
 def scrape_and_update_valor(url):
-    global shared_valor_actual
-    while True:
-        valor_actual = scrape_valor(url)
-        with lock:
+    global shared_valor_actual, app_running
+    valor_actual = scrape_valor(url)
+    with lock:
             shared_valor_actual = valor_actual
-        #time.sleep(60)  # Esperar 1 minuto antes de la próxima actualización
+       
 
 # Función para manejar el comando /start y obtener el chat_id y el valor objetivo
 def start(update: Update, context: CallbackContext):
@@ -42,8 +41,6 @@ def start(update: Update, context: CallbackContext):
     with lock:
         shared_chat_id = chat_id
     context.user_data['chat_id'] = chat_id
-
-    # Solicitar al usuario que ingrese el valor objetivo
     update.message.reply_text("Ingresa tu valor objetivo en U$D. Ejemplo: '/objetivo 0.005'")
 
 # Función para manejar el comando /objetivo y establecer valor_objetivo
@@ -57,6 +54,15 @@ def objetivo(update: Update, context: CallbackContext):
         update.message.reply_text(f"¡Valor objetivo establecido en {valor_objetivo} U$D!")
     except (IndexError, ValueError):
         update.message.reply_text("Proporciona un valor válido. Ejemplo: '/objetivo 0.005'")
+
+# Función para manejar el comando /stop y detener el bot
+def stop(update: Update, context: CallbackContext):
+    update.message.reply_text("Bot detenido.")
+    updater.stop()
+    context.job_queue.stop()
+    context.user_data.clear()
+    st_container.text("Bot detenido.")
+    st.stop()
 
 # Función para enviar alertas
 def send_alert(chat_id, valor_objetivo, valor_actual):
@@ -76,7 +82,6 @@ def actualizar_valor_objetivo(chat_id, valor_objetivo):
         global shared_valor_objetivo
         shared_valor_objetivo = nuevo_valor_objetivo
 
-
 # Configurar el bot con el token proporcionado por BotFather
 bot = Bot(telegram_token)
 updater = Updater(bot=bot, use_context=True)
@@ -88,6 +93,10 @@ objetivo_handler = CommandHandler('objetivo', objetivo)
 
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(objetivo_handler)
+
+# Registrar el manejador para el comando /stop
+stop_handler = CommandHandler('stop', stop)
+dispatcher.add_handler(stop_handler)
 
 # Iniciar el bucle para recibir actualizaciones de Telegram en un hilo separado
 updater_thread = threading.Thread(target=updater.start_polling)
@@ -105,20 +114,23 @@ def update_interface():
         valor_objetivo = shared_valor_objetivo
         valor_actual = shared_valor_actual
 
-    st_container.markdown("[Envía '/start' y luego '/objetivo' al bot de Telegram](https://t.me/Alert_7011371_bot)")
+    st_container.markdown("[comandos del bot /start  , /objetivo , /stop ]('https://t.me/Alert_1113311_bot')")
 
     if chat_id is not None:
         st_container.text(f'Precio actual UBI: {valor_actual:.6f}\n'
                           f'Valor objetivo recibido en la app: {valor_objetivo},\n')      
         # Pasa chat_id, valor_objetivo y valor_actual como argumentos
         send_alert(chat_id, valor_objetivo, valor_actual)
-
+     
 # Ejecutar la aplicación Streamlit
-        
 if __name__ == "__main__":
     st.title("Alerta Precio UBI")
-    st_container = st.empty()  # Crea un contenedor vacío
-
+    st_container = st.empty()  
     while True:
         update_interface()
         time.sleep(10)
+
+    
+
+
+    
