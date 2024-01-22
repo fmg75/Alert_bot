@@ -114,7 +114,8 @@ def update_interface():
         valor_objetivo = shared_valor_objetivo
         valor_actual = shared_valor_actual
 
-    st_container.markdown("[comandos del bot /start  , /objetivo , /stop ]('https://t.me/Alert_1113311_bot')")
+    st_container.markdown("[comandos del bot /start   /objetivo  /stop](https://t.me/Alert_1113311_bot)")
+
 
     if chat_id is not None:
         st_container.text(f'Precio actual UBI: {valor_actual:.6f}\n'
