@@ -60,7 +60,10 @@ def stop(update: Update, context: CallbackContext):
     context.job_queue.stop()
     context.user_data.clear()
     st_container.text("Bot detenido.")
+    global app_running
+    app_running = False
     st.stop()
+    
 
 # Función para enviar alertas
 def send_alert(chat_id, valor_objetivo, valor_actual):
@@ -73,7 +76,8 @@ def send_alert(chat_id, valor_objetivo, valor_actual):
                     
 # Función para actualizar el valor objetivo
 def actualizar_valor_objetivo(chat_id, valor_objetivo):
-    nuevo_valor_objetivo = round(valor_objetivo * 1.05, 6)  # Incrementar en un 5%
+    global shared_valor_actual
+    nuevo_valor_objetivo = round(shared_valor_actual * 1.05, 6)  # Incrementar en un 5%
     bot.send_message(chat_id=chat_id, text=f"Nuevo objetivo + 5%: {round(nuevo_valor_objetivo, 6)}")
     # Actualizar el valor objetivo compartido
     with lock:
@@ -121,15 +125,19 @@ def update_interface():
         # Pasa chat_id, valor_objetivo y valor_actual como argumentos
         send_alert(chat_id, valor_objetivo, valor_actual)
      
+
+app_running = True
 # Ejecutar la aplicación Streamlit
 if __name__ == "__main__":
-    st.title("Alerta Precio UBI")
-    st_container = st.empty()  
-    while True:
-        update_interface()
-        time.sleep(10)
+        st.title("Alerta Precio UBI")
+        st_container = st.empty()  # Antes del bucle principal
+        #app_running = True
 
+        while app_running:
+            update_interface()
+            time.sleep(10)
     
-
-
+# Después de cambiar app_running a False
+updater_thread.join()
+scrape_thread.join()
     
