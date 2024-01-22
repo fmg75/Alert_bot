@@ -121,7 +121,7 @@ def update_interface():
 
     if chat_id is not None:
         st_container.text(f'Precio actual UBI: {valor_actual:.6f}\n'
-                          f'Valor objetivo recibido en la app: {valor_objetivo},\n')      
+                          f'Valor objetivo ingresado en el bot: {valor_objetivo},\n')      
         # Pasa chat_id, valor_objetivo y valor_actual como argumentos
         send_alert(chat_id, valor_objetivo, valor_actual)
      
